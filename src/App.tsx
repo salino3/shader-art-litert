@@ -1,6 +1,6 @@
 import { useState } from "react";
 import viteLogo from "/vite.svg";
-import { Home } from "./components";
+import { Home } from "./pages";
 import "./App.scss";
 
 function App() {
