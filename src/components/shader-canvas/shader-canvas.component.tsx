@@ -105,23 +105,16 @@ const renderShaderCode: string = `
 export const ShaderCanvas: React.FC = () => {
   // Persistent storage for WebGPU objects
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  // @ts-ignore
   const gpuState = useRef<{
-    // @ts-ignore
     device: GPUDevice | null;
-    // @ts-ignore
     context: GPUCanvasContext | null;
-    // @ts-ignore
     textures: GPUTexture[]; // [TextureA, TextureB]
-    // @ts-ignore
     bindGroups: GPUBindGroup[][]; // [ [ComputeA, ComputeB], [RenderA, RenderB] ]
-    // @ts-ignore
     computePipeline: GPUComputePipeline | null;
-    // @ts-ignore
     renderPipeline: GPURenderPipeline | null;
-    // @ts-ignore
     sampler: GPUSampler | null;
     frameIndex: number; // 0 or 1 for ping-pong
-    // @ts-ignore
     presentationFormat: GPUTextureFormat;
     animationFrameId: number;
   }>({
@@ -170,6 +163,7 @@ export const ShaderCanvas: React.FC = () => {
     computePass.dispatchWorkgroups(workgroupCountX, workgroupCountY);
 
     computePass.end();
+    // @ts-ignore
     state.device.queue.submit([computeEncoder.finish()]);
 
     // --- B. Render Pass (Display: Read Current Buffer) ---
@@ -239,6 +233,7 @@ export const ShaderCanvas: React.FC = () => {
 
         // Store state objects
         gpuState.current.device = device;
+        // @ts-ignore
         gpuState.current.context = context;
         gpuState.current.presentationFormat = presentationFormat;
 
@@ -296,6 +291,7 @@ export const ShaderCanvas: React.FC = () => {
         // ... (The Compute Bind Group code is correct, leaving it as is)
         const computeBindGroupA = device.createBindGroup({
           // Reads A, Writes B
+          // @ts-ignore
           layout: gpuState.current.computePipeline.getBindGroupLayout(0),
           entries: [
             { binding: 0, resource: textureA.createView() },
@@ -304,6 +300,7 @@ export const ShaderCanvas: React.FC = () => {
         });
         const computeBindGroupB = device.createBindGroup({
           // Reads B, Writes A
+          // @ts-ignore
           layout: gpuState.current.computePipeline.getBindGroupLayout(0),
           entries: [
             { binding: 0, resource: textureB.createView() },
@@ -316,6 +313,7 @@ export const ShaderCanvas: React.FC = () => {
 
         const renderBindGroupA = device.createBindGroup({
           // Reads A
+          // @ts-ignore
           layout: gpuState.current.renderPipeline.getBindGroupLayout(0),
           entries: [
             { binding: 0, resource: textureA.createView() }, // Solo la Texture View
@@ -323,6 +321,7 @@ export const ShaderCanvas: React.FC = () => {
         });
         const renderBindGroupB = device.createBindGroup({
           // Reads B
+          // @ts-ignore
           layout: gpuState.current.renderPipeline.getBindGroupLayout(0),
           entries: [
             { binding: 0, resource: textureB.createView() }, // Solo la Texture View
