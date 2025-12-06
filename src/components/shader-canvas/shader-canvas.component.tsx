@@ -2,14 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 
 // Canvas dimensions
 const WIDTH = 700;
-const HEIGHT = 600;
+const HEIGHT = 450;
 
-// Tamaño del grupo de trabajo para el Compute Shader
-// El producto (8 * 8 * 1 = 64) debe ser un divisor del total de píxeles
 const WORKGROUP_SIZE = 8;
 
 // --- 1. Compute Shader: Wave Propagation (Simplified) ---
-// Calcula el siguiente estado de la onda leyendo del estado actual (inputTexture).
+// Calculates the next waveform state by reading from the current state (inputTexture).
 // --- 1. Compute Shader: Wave Propagation (CORREGIDO: Tipos i32 para coordenadas) ---
 const waveComputeShaderCode: string = `
     // Binding 0: Input Texture (Buffer A: Current State)
@@ -62,10 +60,10 @@ const waveComputeShaderCode: string = `
 `;
 
 // --- 2. Render Shader: Read Texture and Color ---
-// Dibuja el quad y lee la textura de simulación para colorear los píxeles.
+// Draw the quad and read the simulation texture to color the pixels.
 // --- 2. Render Shader: Read Texture and Color (CORREGIDO: Usa textureLoad) ---
 const renderShaderCode: string = `
-    // Binding 0: Simulation Texture (Buffer A) - Ahora leemos la altura sin filtrado
+    // Binding 0: Simulation Texture (Buffer A) - Now we read the height without filtering.
     // La declaramos como texture_2d<f32>
     @group(0) @binding(0) 
     var simulationTexture: texture_2d<f32>; 
@@ -85,10 +83,10 @@ const renderShaderCode: string = `
     // Fragment Shader: Color based on wave height
     @fragment
     fn fs_main(@builtin(position) frag_coord: vec4<f32>) -> @location(0) vec4<f32> {
-        // 1. Obtener coordenadas de píxel enteras (i32)
+        // 1. Get integer pixel coordinates (i32)
         let coords = vec2<i32>(frag_coord.xy); 
         
-        // 2. Lee el valor de la onda directamente usando textureLoad (sin muestreo)
+        // 2. Read the waveform value directly using textureLoad (without sampling)
         // textureLoad(textura, coordenadas, nivel_mipmap).r
         let waveValue = textureLoad(simulationTexture, coords, 0).r; 
 
@@ -105,6 +103,7 @@ const renderShaderCode: string = `
 export const ShaderCanvas: React.FC = () => {
   // Persistent storage for WebGPU objects
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  // @ts-ignore
   const gpuState = useRef<{
     device: GPUDevice | null;
     context: GPUCanvasContext | null;
@@ -145,7 +144,7 @@ export const ShaderCanvas: React.FC = () => {
 
     // Ping-pong indices: [0] is current (read), [1] is next (write)
     const currentBufferIndex = state.frameIndex % 2;
-    const nextBufferIndex = (state.frameIndex + 1) % 2;
+    // TODO: delete? const nextBufferIndex = (state.frameIndex + 1) % 2;
 
     // --- A. Compute Pass (Simulation: Read Current, Write Next) ---
     const computeEncoder = state.device.createCommandEncoder();
@@ -162,6 +161,7 @@ export const ShaderCanvas: React.FC = () => {
     computePass.dispatchWorkgroups(workgroupCountX, workgroupCountY);
 
     computePass.end();
+    // @ts-ignore
     state.device.queue.submit([computeEncoder.finish()]);
 
     // --- B. Render Pass (Display: Read Current Buffer) ---
@@ -207,6 +207,7 @@ export const ShaderCanvas: React.FC = () => {
       }
 
       try {
+        // @ts-ignore
         const adapter = await navigator.gpu.requestAdapter();
         if (!adapter) {
           setStatus("❌ Error: Could not get the GPU adapter.");
@@ -219,9 +220,9 @@ export const ShaderCanvas: React.FC = () => {
           setStatus("❌ Error: Could not get the 'webgpu' context.");
           return;
         }
-
+        // @ts-ignore
         const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
-
+        // @ts-ignore
         context.configure({
           device: device,
           format: presentationFormat,
@@ -230,18 +231,24 @@ export const ShaderCanvas: React.FC = () => {
 
         // Store state objects
         gpuState.current.device = device;
+        // @ts-ignore
         gpuState.current.context = context;
         gpuState.current.presentationFormat = presentationFormat;
 
         // --- 7. Create Textures and Sampler (Double Buffer) ---
 
+        // @ts-ignore
         const textureDescriptor: GPUTextureDescriptor = {
           size: { width: WIDTH, height: HEIGHT },
           format: "rgba16float", // High precision for simulation
           usage:
+            // @ts-ignore
             GPUTextureUsage.RENDER_ATTACHMENT | // Can be a render target (optional)
+            // @ts-ignore
             GPUTextureUsage.TEXTURE_BINDING | // Can be read by shaders
+            // @ts-ignore
             GPUTextureUsage.STORAGE_BINDING | // Can be written by compute shaders
+            // @ts-ignore
             GPUTextureUsage.COPY_DST, // Can be written from the CPU
         };
 
@@ -282,6 +289,7 @@ export const ShaderCanvas: React.FC = () => {
         // ... (The Compute Bind Group code is correct, leaving it as is)
         const computeBindGroupA = device.createBindGroup({
           // Reads A, Writes B
+          // @ts-ignore
           layout: gpuState.current.computePipeline.getBindGroupLayout(0),
           entries: [
             { binding: 0, resource: textureA.createView() },
@@ -290,6 +298,7 @@ export const ShaderCanvas: React.FC = () => {
         });
         const computeBindGroupB = device.createBindGroup({
           // Reads B, Writes A
+          // @ts-ignore
           layout: gpuState.current.computePipeline.getBindGroupLayout(0),
           entries: [
             { binding: 0, resource: textureB.createView() },
@@ -302,16 +311,18 @@ export const ShaderCanvas: React.FC = () => {
 
         const renderBindGroupA = device.createBindGroup({
           // Reads A
+          // @ts-ignore
           layout: gpuState.current.renderPipeline.getBindGroupLayout(0),
           entries: [
-            { binding: 0, resource: textureA.createView() }, // Solo la Texture View
+            { binding: 0, resource: textureA.createView() }, // Texture View Only
           ],
         });
         const renderBindGroupB = device.createBindGroup({
           // Reads B
+          // @ts-ignore
           layout: gpuState.current.renderPipeline.getBindGroupLayout(0),
           entries: [
-            { binding: 0, resource: textureB.createView() }, // Solo la Texture View
+            { binding: 0, resource: textureB.createView() }, // Texture View Only
           ],
         });
         gpuState.current.bindGroups[1] = [renderBindGroupA, renderBindGroupB];
@@ -363,7 +374,12 @@ export const ShaderCanvas: React.FC = () => {
 
   return (
     <div
-      style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "flex-start",
+      }}
     >
       <h2>WebGPU Wave Simulator (Native)</h2>
       <canvas
@@ -375,7 +391,7 @@ export const ShaderCanvas: React.FC = () => {
       />
       <p>Status: **{status}**</p>
       <p style={{ marginTop: "10px" }}>
-        **Haga clic en el lienzo para crear una onda.**
+        **Click on the canvas to create a wave.**
       </p>
     </div>
   );
