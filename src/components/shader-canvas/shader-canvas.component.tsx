@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 
 // Canvas dimensions
 const WIDTH = 700;
-const HEIGHT = 600;
+const HEIGHT = 450;
 
 const WORKGROUP_SIZE = 8;
 
@@ -374,7 +374,12 @@ export const ShaderCanvas: React.FC = () => {
 
   return (
     <div
-      style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "flex-start",
+      }}
     >
       <h2>WebGPU Wave Simulator (Native)</h2>
       <canvas

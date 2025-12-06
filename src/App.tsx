@@ -2,12 +2,7 @@ import { Home } from "./pages";
 import "./App.scss";
 
 function App() {
-  return (
-    <>
-      <h1>Vite + React</h1>
-      <Home />
-    </>
-  );
+  return <Home />;
 }
 
 export default App;
