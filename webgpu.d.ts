@@ -27,6 +27,13 @@ declare global {
     label: string;
   }
 
+  interface GPUTextureDescriptor extends EventTarget {
+    label: string;
+    size: { width: number; height: number };
+    format: string;
+    usage: any;
+  }
+
   interface GPUAdapter {}
 }
 

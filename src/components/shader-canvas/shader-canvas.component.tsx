@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 
 // Canvas dimensions
-const WIDTH = 700;
-const HEIGHT = 450;
+const WIDTH: number = 700;
+const HEIGHT: number = 450;
 
-const WORKGROUP_SIZE = 8;
+const WORKGROUP_SIZE: number = 8;
 
 // --- 1. Compute Shader: Wave Propagation (Simplified) ---
 // Calculates the next waveform state by reading from the current state (inputTexture).
