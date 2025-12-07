@@ -418,7 +418,7 @@ export const ReactionDiffusionCanvas: React.FC = () => {
       <p className="pMargin0">Parameters: F=0.055, K=0.062 (Generates organic patterns)</p>
         <p className="pMargin0">Status: **{status}**</p>
       <p className="pMargin0" style={{ marginBottom: "10px" }}>
-        **Click on the canvas to inject substance V and start the reaction.**
+        **Click on the canvas to inject catalyst and start the reaction.**
       </p>
       <canvas
         ref={canvasRef}
