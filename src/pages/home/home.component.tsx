@@ -1,5 +1,5 @@
 import React from "react";
-import { ShaderCanvas } from "../../components";
+import { ReactionDiffusionCanvas, ShaderCanvas } from "../../components";
 import "./home.styles.scss";
 
 export const Home: React.FC = () => {
@@ -8,6 +8,11 @@ export const Home: React.FC = () => {
       <details>
         <summary>WebGPU Wave Simulator</summary>
         <ShaderCanvas />
+      </details>
+      <br />
+      <details>
+        <summary>Reaction Diffusion Canvas</summary>
+        <ReactionDiffusionCanvas />
       </details>
     </div>
   );
