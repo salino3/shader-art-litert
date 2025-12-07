@@ -14,11 +14,11 @@ const rdComputeShaderCode: string = `
     @group(0) @binding(1) var outputTexture: texture_storage_2d<rgba32float, write>; // <-- Usamos rgba32float aquí
 
     // Simulation constants for Gray-Scott (Patrones similares a la imagen)
-    const DU: f32 = 0.16; // Diffusion Rate of U
-    const DV: f32 = 0.08; // Diffusion Rate of V
-    const F: f32 = 0.055; // Feed Rate
-    const K: f32 = 0.062; // Kill Rate
-    const DT: f32 = 1.0; // Time step
+    const DU: f32 = 0.16; // Increased Diffusion Rate of U (Faster spread)
+    const DV: f32 = 0.08; // Increased Diffusion Rate of V (Faster spread)
+    const F: f32 = 0.055; // Feed Rate (Maintain pattern type)
+    const K: f32 = 0.062; // Kill Rate (Maintain pattern type)
+    const DT: f32 = 1.4;  // Time step (Faster overall evolution)
 
     @compute
     @workgroup_size(${WORKGROUP_SIZE}, ${WORKGROUP_SIZE}, 1)
