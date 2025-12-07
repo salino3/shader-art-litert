@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
+import './shader-canvas.styles.scss'
 
 // Canvas dimensions
-const WIDTH = 700;
-const HEIGHT = 450;
+const WIDTH: number = 700;
+const HEIGHT: number = 450;
 
-const WORKGROUP_SIZE = 8;
+const WORKGROUP_SIZE: number = 8;
 
 // --- 1. Compute Shader: Wave Propagation (Simplified) ---
 // Calculates the next waveform state by reading from the current state (inputTexture).
@@ -374,14 +375,13 @@ export const ShaderCanvas: React.FC = () => {
 
   return (
     <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "flex-start",
-      }}
+      className="rootShaderCanvas"
     >
       <h2>WebGPU Wave Simulator (Native)</h2>
+        <p className="pMargin0">Status: **{status}**</p>
+      <p className="pMargin0" style={{ marginBottom: "10px" }}>
+        **Click on the canvas to create a wave.**
+      </p>
       <canvas
         ref={canvasRef}
         width={WIDTH}
@@ -389,10 +389,7 @@ export const ShaderCanvas: React.FC = () => {
         style={{ border: "1px solid #ccc", cursor: "pointer" }}
         onClick={handleCanvasClick}
       />
-      <p>Status: **{status}**</p>
-      <p style={{ marginTop: "10px" }}>
-        **Click on the canvas to create a wave.**
-      </p>
+     
     </div>
   );
 };
