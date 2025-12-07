@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import './reaction-diffusion-canvas.styles.scss'
 
 // Canvas dimensions
 const WIDTH: number = 700;
@@ -414,7 +415,11 @@ export const ReactionDiffusionCanvas: React.FC = () => {
       className="rootReactionDiffusionCanvas"
      >
       <h2>WebGPU Gray-Scott Reaction-Diffusion</h2>
-      <p>Parameters: F=0.055, K=0.062 (Generates organic patterns)</p>
+      <p className="pMargin0">Parameters: F=0.055, K=0.062 (Generates organic patterns)</p>
+        <p className="pMargin0">Status: **{status}**</p>
+      <p className="pMargin0" style={{ marginBottom: "10px" }}>
+        **Click on the canvas to inject substance V and start the reaction.**
+      </p>
       <canvas
         ref={canvasRef}
         width={WIDTH}
@@ -422,10 +427,7 @@ export const ReactionDiffusionCanvas: React.FC = () => {
         style={{ border: "1px solid #ccc", cursor: "pointer" }}
         onClick={handleCanvasClick}
       />
-      <p>Status: **{status}**</p>
-      <p style={{ marginTop: "10px" }}>
-        **Click on the canvas to inject substance V and start the reaction.**
-      </p>
+  
     </div>
   );
 };
