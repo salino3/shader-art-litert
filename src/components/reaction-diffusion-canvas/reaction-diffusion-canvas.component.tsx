@@ -412,8 +412,7 @@ export const ReactionDiffusionCanvas: React.FC = () => {
   return (
     <div
       className="rootReactionDiffusionCanvas"
-      style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
-    >
+     >
       <h2>WebGPU Gray-Scott Reaction-Diffusion</h2>
       <p>Parameters: F=0.055, K=0.062 (Generates organic patterns)</p>
       <canvas

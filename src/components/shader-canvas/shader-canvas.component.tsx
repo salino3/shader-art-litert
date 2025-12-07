@@ -374,12 +374,7 @@ export const ShaderCanvas: React.FC = () => {
 
   return (
     <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "flex-start",
-      }}
+      className="rootShaderCanvas"
     >
       <h2>WebGPU Wave Simulator (Native)</h2>
       <canvas
