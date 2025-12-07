@@ -155,7 +155,7 @@ export const ReactionDiffusionCanvas: React.FC = () => {
   const [status, setStatus] = useState("Initializing WebGPU...");
 
   // ----------------------------------------------------------------------------------
-  // --- 3. Animation Loop (Draw Frame) --- ¡La función que faltaba!
+  // --- 3. Animation Loop (Draw Frame) ---
   // ----------------------------------------------------------------------------------
   const drawFrame = () => {
     const state = gpuState.current;
@@ -402,15 +402,16 @@ export const ReactionDiffusionCanvas: React.FC = () => {
 
     // **3. Escribir el parche completo**
     state.device.queue.writeTexture(
-      { texture: writeTexture, origin: { x: x - 2, y: y - 2 } }, // Iniciar 2 píxeles antes
-      fullPatchData, // Usar el array grande
-      { bytesPerRow: bytesPerRow, rowsPerImage: patchSize }, // Indicar 5 filas
-      { width: patchSize, height: patchSize } // Indicar 5x5 a copiar
+      { texture: writeTexture, origin: { x: x - 2, y: y - 2 } }, // Start 2 pixels before
+      fullPatchData, // Use the large array
+      { bytesPerRow: bytesPerRow, rowsPerImage: patchSize }, // Indicate 5 rows
+      { width: patchSize, height: patchSize } // Specify 5x5 to copy
     );
   };
 
   return (
     <div
+      className="rootReactionDiffusionCanvas"
       style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
     >
       <h2>WebGPU Gray-Scott Reaction-Diffusion</h2>
