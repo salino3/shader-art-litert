@@ -3,7 +3,21 @@
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
+
+  .homeTitle {
+    font-size: 3rem;
+    font-weight: 800;
+    margin: 2rem 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
   details {
+    border-top: solid;
    display: flex;
   flex-direction: column;
   justify-content: flex-start;
