@@ -11,9 +11,9 @@ const rdComputeShaderCode: string = `
     @group(0) @binding(0) var inputTexture: texture_2d<f32>;
 
     // Binding 1: Output Texture (Buffer B: Next State)
-    @group(0) @binding(1) var outputTexture: texture_storage_2d<rgba32float, write>; // <-- Usamos rgba32float aquí
+    @group(0) @binding(1) var outputTexture: texture_storage_2d<rgba32float, write>; // <-- Using rgba32float here
 
-    // Simulation constants for Gray-Scott (Patrones similares a la imagen)
+    // Simulation constants for Gray-Scott (Patterns similar to the image)
     const DU: f32 = 0.16; // Increased Diffusion Rate of U (Faster spread)
     const DV: f32 = 0.08; // Increased Diffusion Rate of V (Faster spread)
     const F: f32 = 0.055; // Feed Rate (Maintain pattern type)
@@ -97,29 +97,29 @@ const rdRenderShaderCode: string = `
         let u = uv_values.r;
         let v = uv_values.g;
         
-        // Mapeo de color basado en V (la sustancia que forma los patrones)
-        // Usamos la concentración de U para suavizar la transición.
+        // Color mapping based on V (the substance that forms the patterns)
+        // Using U concentration to smooth the transition.
         
-        let color_base = vec3<f32>(0.2, 0.4, 0.6);      // Azul oscuro de fondo (U alto)
-        let color_mid = vec3<f32>(0.5, 0.7, 0.8);       // Azul claro (Patrón joven)
-        let color_peak = vec3<f32>(0.8, 0.7, 0.3);      // Marrón/Amarillo (Patrón maduro - Alto V)
+        let color_base = vec3<f32>(0.2, 0.4, 0.6);      // Dark blue background (High U)
+        let color_mid = vec3<f32>(0.5, 0.7, 0.8);       // Light blue (Young pattern)
+        let color_peak = vec3<f32>(0.8, 0.7, 0.3);      // Brown/Yellow (Mature pattern - High V)
 
-        // Interpolación lineal simple basada en la concentración de V
+        // Simple linear interpolation based on V concentration
         var final_color: vec3<f32>;
-        let factor = clamp(v * 4.0, 0.0, 1.0); // Amplificamos V para un mejor contraste
+        let factor = clamp(v * 4.0, 0.0, 1.0); // Amplify V for better contrast
         
         if (factor < 0.25) {
-            // Fondo (U)
+            // Background (U)
             final_color = color_base;
         } else if (factor < 0.75) {
-            // Transición a Patrón
+            // Transition to Pattern
             final_color = mix(color_base, color_mid, (factor - 0.25) * 2.0);
         } else {
-            // Pico del Patrón
+            // Pattern Peak
             final_color = mix(color_mid, color_peak, (factor - 0.75) * 4.0);
         }
         
-        // También podemos usar U para modular la luminosidad
+        // We can also use U to modulate luminosity
         final_color *= (u * 0.5 + 0.5); 
 
         return vec4<f32>(final_color, 1.0);
@@ -168,9 +168,9 @@ export const ReactionDiffusionCanvas: React.FC = () => {
       return;
     }
 
-    // Ping-pong: currentBufferIndex es el buffer que se lee (Input), nextBufferIndex es el que se escribe (Output)
+    // Ping-pong: currentBufferIndex is the buffer being read (Input), nextBufferIndex is the one being written (Output)
     const currentBufferIndex = state.frameIndex % 2;
-    // const nextBufferIndex = (state.frameIndex + 1) % 2; // No se usa directamente aquí, solo en el BindGroup
+    // const nextBufferIndex = (state.frameIndex + 1) % 2; // Not used directly here, only in the BindGroup
 
     // --- A. Compute Pass (Simulation: Read Current, Write Next) ---
     const computeEncoder = state.device.createCommandEncoder();
@@ -178,7 +178,7 @@ export const ReactionDiffusionCanvas: React.FC = () => {
 
     computePass.setPipeline(state.computePipeline);
 
-    // BindGroup[0][currentBufferIndex]: Lee A, Escribe B (si current=0), o Lee B, Escribe A (si current=1)
+    // BindGroup[0][currentBufferIndex]: Read A, Write B (if current=0), or Read B, Write A (if current=1)
     computePass.setBindGroup(0, state.bindGroups[0][currentBufferIndex]);
 
     const workgroupCountX = Math.ceil(WIDTH / WORKGROUP_SIZE);
@@ -189,7 +189,7 @@ export const ReactionDiffusionCanvas: React.FC = () => {
     state.device.queue.submit([computeEncoder.finish()]);
 
     // --- B. Render Pass (Display: Read Current Buffer) ---
-    // La renderización siempre lee el estado que acaba de ser INPUT (currentBufferIndex)
+    // Rendering always reads the state that was just INPUT (currentBufferIndex)
     const textureView = state.context.getCurrentTexture().createView();
     const renderEncoder = state.device.createCommandEncoder();
 
@@ -206,7 +206,7 @@ export const ReactionDiffusionCanvas: React.FC = () => {
 
     renderPass.setPipeline(state.renderPipeline);
 
-    // BindGroup[1][currentBufferIndex]: Lee el mismo buffer que fue Input en el Compute Pass
+    // BindGroup[1][currentBufferIndex]: Reads the same buffer that was Input in the Compute Pass
     renderPass.setBindGroup(0, state.bindGroups[1][currentBufferIndex]);
     renderPass.draw(6); // Draw the full-screen quad
     renderPass.end();
@@ -214,7 +214,7 @@ export const ReactionDiffusionCanvas: React.FC = () => {
     state.device.queue.submit([renderEncoder.finish()]);
 
     // --- C. Ping-Pong and Loop ---
-    state.frameIndex++; // Cambia el "current" para la próxima iteración
+    state.frameIndex++; // Changes "current" for the next iteration
     state.animationFrameId = requestAnimationFrame(drawFrame);
   };
   // ----------------------------------------------------------------------------------
@@ -269,7 +269,7 @@ export const ReactionDiffusionCanvas: React.FC = () => {
         const textureB = device.createTexture(textureDescriptor);
         gpuState.current.textures = [textureA, textureB];
 
-        // **Inicializar el estado (U=1.0, V=0.0)**
+        // **Initialize state (U=1.0, V=0.0)**
         const initialDataSize = WIDTH * HEIGHT * 4;
         const initialData = new Float32Array(initialDataSize).map(
           (_, index) => {
@@ -294,7 +294,7 @@ export const ReactionDiffusionCanvas: React.FC = () => {
           { width: WIDTH, height: HEIGHT }
         );
 
-        // --- 8. Create Pipelines (Usando los nuevos Shaders) ---
+        // --- 8. Create Pipelines (Using the new Shaders) ---
         const computeModule = device.createShaderModule({
           code: rdComputeShaderCode,
         });
@@ -380,11 +380,11 @@ export const ReactionDiffusionCanvas: React.FC = () => {
     const impulse_V = 1.0;
     const impulse_U = 0.5;
 
-    // **1. Crear el array de datos completo para el parche (5x5 píxeles)**
-    // (25 píxeles * 4 componentes = 100 elementos)
+    // **1. Create the full data array for the patch (5x5 pixels)**
+    // (25 pixels * 4 components = 100 elements)
     const fullPatchData = new Float32Array(patchSize * patchSize * 4);
 
-    // Llenar el array con los valores U y V (uniformes en el parche)
+    // Fill the array with U and V values (uniform in the patch)
     for (let i = 0; i < patchSize * patchSize; i++) {
       const baseIndex = i * 4;
       fullPatchData[baseIndex] = impulse_U; // R (U)
@@ -396,11 +396,11 @@ export const ReactionDiffusionCanvas: React.FC = () => {
     const currentBufferIndex = state.frameIndex % 2;
     const writeTexture = state.textures[currentBufferIndex];
 
-    // **2. Calcular bytesPerRow CORRECTO**
-    // 5 píxeles de ancho * 16 bytes/píxel = 80 bytes
+    // **2. Calculate CORRECT bytesPerRow**
+    // 5 pixels wide * 16 bytes/pixel = 80 bytes
     const bytesPerRow = patchSize * 4 * 4;
 
-    // **3. Escribir el parche completo**
+    // **3. Write the full patch**
     state.device.queue.writeTexture(
       { texture: writeTexture, origin: { x: x - 2, y: y - 2 } }, // Start 2 pixels before
       fullPatchData, // Use the large array
