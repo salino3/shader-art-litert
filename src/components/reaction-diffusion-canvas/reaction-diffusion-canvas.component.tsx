@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import './reaction-diffusion-canvas.styles.scss'
+import "./reaction-diffusion-canvas.styles.scss";
 
 // Canvas dimensions
 const WIDTH: number = 700;
@@ -371,11 +371,20 @@ export const ReactionDiffusionCanvas: React.FC = () => {
   // --- 5. User Interaction (Mouse Click to Inject V) ---
   const handleCanvasClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
     const state = gpuState.current;
+    const canvasEl = event.currentTarget;
     if (!state.device || !state.context) return;
 
-    const rect = event.currentTarget.getBoundingClientRect();
-    const x = Math.floor(event.clientX - rect.left);
-    const y = Math.floor(event.clientY - rect.top);
+    const rect = canvasEl.getBoundingClientRect();
+    const scaleX = canvasEl.width / rect.width;
+    const scaleY = canvasEl.height / rect.height;
+    const x = Math.min(
+      canvasEl.width - 1,
+      Math.floor((event.clientX - rect.left) * scaleX)
+    );
+    const y = Math.min(
+      canvasEl.height - 1,
+      Math.floor((event.clientY - rect.top) * scaleY)
+    );
 
     const patchSize = 5; // 5x5 patch
     const impulse_V = 1.0;
@@ -411,23 +420,22 @@ export const ReactionDiffusionCanvas: React.FC = () => {
   };
 
   return (
-    <div
-      className="rootReactionDiffusionCanvas"
-     >
+    <div className="rootReactionDiffusionCanvas">
       <h2>WebGPU Gray-Scott Reaction-Diffusion</h2>
-      <p className="pMargin0">Parameters: F=0.055, K=0.062 (Generates organic patterns)</p>
-        <p className="pMargin0">Status: **{status}**</p>
+      <p className="pMargin0">
+        Parameters: F=0.055, K=0.062 (Generates organic patterns)
+      </p>
+      <p className="pMargin0">Status: **{status}**</p>
       <p className="pMargin0" style={{ marginBottom: "10px" }}>
         **Click on the canvas to inject catalyst and start the reaction.**
       </p>
       <canvas
         ref={canvasRef}
+        className="gpuCanvas"
         width={WIDTH}
         height={HEIGHT}
-        style={{ border: "1px solid #ccc", cursor: "pointer" }}
         onClick={handleCanvasClick}
       />
-  
     </div>
   );
 };

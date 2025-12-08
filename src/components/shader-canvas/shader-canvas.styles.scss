@@ -3,11 +3,34 @@
    flex-direction: column;
    align-items: center;
    justify-content: center;
+   gap: 0.5rem;
+   width: 100%;
+
    h2 {
      margin-bottom: 0;
     }
 
     .pMargin0 {
       margin: 0;
+      text-align: center;
     }
+
+   .gpuCanvas {
+      width: 100%;
+      max-width: 700px;
+      aspect-ratio: 14 / 9;
+      height: auto;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      background: #111;
+      border-radius: 8px;
+   }
+}
+
+@media (max-width: 480px) {
+  .rootShaderCanvas {
+    .gpuCanvas {
+      max-width: 100%;
+    }
+  }
 }

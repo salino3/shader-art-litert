@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import './shader-canvas.styles.scss'
+import "./shader-canvas.styles.scss";
 
 // Canvas dimensions
 const WIDTH: number = 700;
@@ -349,11 +349,20 @@ export const ShaderCanvas: React.FC = () => {
   // --- 5. User Interaction (Mouse Click to Drop Wave) ---
   const handleCanvasClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
     const state = gpuState.current;
+    const canvasEl = event.currentTarget;
     if (!state.device || !state.context) return;
 
-    const rect = event.currentTarget.getBoundingClientRect();
-    const x = Math.floor(event.clientX - rect.left);
-    const y = Math.floor(event.clientY - rect.top);
+    const rect = canvasEl.getBoundingClientRect();
+    const scaleX = canvasEl.width / rect.width;
+    const scaleY = canvasEl.height / rect.height;
+    const x = Math.min(
+      canvasEl.width - 1,
+      Math.floor((event.clientX - rect.left) * scaleX)
+    );
+    const y = Math.min(
+      canvasEl.height - 1,
+      Math.floor((event.clientY - rect.top) * scaleY)
+    );
 
     // Data to "drop" the wave (a small impulse)
     // [R=Impulse_Height, G=Previous_Height, B=0, A=1]
@@ -374,22 +383,19 @@ export const ShaderCanvas: React.FC = () => {
   };
 
   return (
-    <div
-      className="rootShaderCanvas"
-    >
+    <div className="rootShaderCanvas">
       <h2>WebGPU Wave Simulator (Native)</h2>
-        <p className="pMargin0">Status: **{status}**</p>
+      <p className="pMargin0">Status: **{status}**</p>
       <p className="pMargin0" style={{ marginBottom: "10px" }}>
         **Click on the canvas to create a wave.**
       </p>
       <canvas
         ref={canvasRef}
+        className="gpuCanvas"
         width={WIDTH}
         height={HEIGHT}
-        style={{ border: "1px solid #ccc", cursor: "pointer" }}
         onClick={handleCanvasClick}
       />
-     
     </div>
   );
 };
