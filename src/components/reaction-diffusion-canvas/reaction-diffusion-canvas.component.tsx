@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import './reaction-diffusion-canvas.styles.scss'
+import "./reaction-diffusion-canvas.styles.scss";
 
 // Canvas dimensions
 const WIDTH: number = 700;
@@ -377,8 +377,14 @@ export const ReactionDiffusionCanvas: React.FC = () => {
     const rect = canvasEl.getBoundingClientRect();
     const scaleX = canvasEl.width / rect.width;
     const scaleY = canvasEl.height / rect.height;
-    const x = Math.floor((event.clientX - rect.left) * scaleX);
-    const y = Math.floor((event.clientY - rect.top) * scaleY);
+    const x = Math.min(
+      canvasEl.width - 1,
+      Math.floor((event.clientX - rect.left) * scaleX)
+    );
+    const y = Math.min(
+      canvasEl.height - 1,
+      Math.floor((event.clientY - rect.top) * scaleY)
+    );
 
     const patchSize = 5; // 5x5 patch
     const impulse_V = 1.0;
@@ -414,12 +420,12 @@ export const ReactionDiffusionCanvas: React.FC = () => {
   };
 
   return (
-    <div
-      className="rootReactionDiffusionCanvas"
-     >
+    <div className="rootReactionDiffusionCanvas">
       <h2>WebGPU Gray-Scott Reaction-Diffusion</h2>
-      <p className="pMargin0">Parameters: F=0.055, K=0.062 (Generates organic patterns)</p>
-        <p className="pMargin0">Status: **{status}**</p>
+      <p className="pMargin0">
+        Parameters: F=0.055, K=0.062 (Generates organic patterns)
+      </p>
+      <p className="pMargin0">Status: **{status}**</p>
       <p className="pMargin0" style={{ marginBottom: "10px" }}>
         **Click on the canvas to inject catalyst and start the reaction.**
       </p>
@@ -430,7 +436,6 @@ export const ReactionDiffusionCanvas: React.FC = () => {
         height={HEIGHT}
         onClick={handleCanvasClick}
       />
-  
     </div>
   );
 };
