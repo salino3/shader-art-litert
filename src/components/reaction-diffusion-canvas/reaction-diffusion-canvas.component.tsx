@@ -371,11 +371,14 @@ export const ReactionDiffusionCanvas: React.FC = () => {
   // --- 5. User Interaction (Mouse Click to Inject V) ---
   const handleCanvasClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
     const state = gpuState.current;
+    const canvasEl = event.currentTarget;
     if (!state.device || !state.context) return;
 
-    const rect = event.currentTarget.getBoundingClientRect();
-    const x = Math.floor(event.clientX - rect.left);
-    const y = Math.floor(event.clientY - rect.top);
+    const rect = canvasEl.getBoundingClientRect();
+    const scaleX = canvasEl.width / rect.width;
+    const scaleY = canvasEl.height / rect.height;
+    const x = Math.floor((event.clientX - rect.left) * scaleX);
+    const y = Math.floor((event.clientY - rect.top) * scaleY);
 
     const patchSize = 5; // 5x5 patch
     const impulse_V = 1.0;
@@ -422,9 +425,9 @@ export const ReactionDiffusionCanvas: React.FC = () => {
       </p>
       <canvas
         ref={canvasRef}
+        className="gpuCanvas"
         width={WIDTH}
         height={HEIGHT}
-        style={{ border: "1px solid #ccc", cursor: "pointer" }}
         onClick={handleCanvasClick}
       />
   
