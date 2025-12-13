@@ -5,7 +5,6 @@ const OFFLINE_URL = '/shader-art-litert/404.html';
 // List of files to precache automatically
 const urlsToCache = [
   ...[
-  "/shader-art-litert/404.html",
   "/shader-art-litert/assets/index-B0Lm3NXW.js",
   "/shader-art-litert/assets/index-BalCoq57.css",
   "/shader-art-litert/index.html"
@@ -45,6 +44,37 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  // Skip non-GET requests
+  if (event.request.method !== 'GET') {
+    return;
+  }
+
+  // Handle root path requests - redirect to index.html
+  const url = new URL(event.request.url);
+  const rootPath = '/shader-art-litert/';
+  const indexPath = '/shader-art-litert/index.html';
+  
+  if (url.pathname === rootPath || url.pathname === rootPath.slice(0, -1) || url.pathname === indexPath) {
+    event.respondWith(
+      caches.match(indexPath)
+        .then((response) => {
+          if (response) return response;
+          return fetch(event.request)
+            .then((networkResponse) => {
+              if (networkResponse && networkResponse.status === 200) {
+                const responseToCache = networkResponse.clone();
+                caches.open(CACHE_NAME).then((cache) => {
+                  cache.put(indexPath, responseToCache);
+                });
+              }
+              return networkResponse;
+            })
+            .catch(() => caches.match(OFFLINE_URL));
+        })
+    );
+    return;
+  }
+
   event.respondWith(
     // Try to find the resource in the cache first
     caches.match(event.request)
@@ -67,13 +97,13 @@ self.addEventListener('fetch', (event) => {
           return networkResponse;
         })
         .catch(() => {
-          // If the network request fails (because we're offline),
-          // and the request is for a navigation, serve the offline page.
+          // If the network request fails (because we're offline)
           if (event.request.mode === 'navigate') {
+            // For navigation requests, serve the offline page (404.html)
             return caches.match(OFFLINE_URL);
           }
-          // For non-navigation requests, return undefined to let browser handle it
-          return undefined;
+          // For other requests, try to match the request URL in cache
+          return caches.match(event.request);
         });
     })
   );
